@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="VerboAuth — Doğal Dil Yapılı Giriş Portalı" />
+  <title>VerboAuth — Giriş Portalı</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css?v=1.0.3" />
+</head>
+<body>
+
+  <!-- Toast bildirim -->
+  <div id="toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+    <span class="toast-message" id="toast-message"></span>
+  </div>
+
+  <main class="portal-container">
+    
+    <!-- Kilit sayacı -->
+    <div id="cooldown-timer" class="cooldown-timer" hidden>
+      <span class="timer-icon">⚠️</span>
+      <span class="timer-text">Sistem Kilitleme Kaldırılıyor: <strong id="timer-countdown">02:00</strong></span>
+    </div>
+    
+    <!-- Giriş & Kayıt kartı -->
+    <div class="auth-card" id="auth-card">
+
+      <!-- Robot maskot -->
+      <div class="mascot-wrapper" id="mascot-robo" aria-hidden="true">
+        <svg viewBox="0 0 120 120" class="robo-svg">
+          <!-- Anten -->
+          <rect x="58" y="15" width="4" height="15" fill="#475569" rx="2" />
+          <circle cx="60" cy="12" r="3.5" fill="#6366f1" class="antenna-led" />
+
+          <!-- Kafa -->
+          <rect x="28" y="30" width="64" height="54" rx="14" fill="#1e293b" stroke="#334155" stroke-width="2" />
+          
+          <!-- Ekran -->
+          <rect x="36" y="38" width="48" height="28" rx="6" fill="#0f172a" />
+          
+          <!-- Ekran metni -->
+          <text x="60" y="56" fill="#6366f1" font-size="7" font-weight="700" text-anchor="middle" class="robo-screen-text" id="robo-screen-text"></text>
+
+          <!-- Gözler -->
+          <ellipse cx="48" cy="52" rx="5" ry="5" fill="#6366f1" class="robo-eye eye-left" />
+          <ellipse cx="72" cy="52" rx="5" ry="5" fill="#6366f1" class="robo-eye eye-right" />
+
+          <!-- Kaşlar -->
+          <path d="M40 43 L54 48" stroke="#f43f5e" stroke-width="2.5" stroke-linecap="round" class="eyebrow eyebrow-left" />
+          <path d="M80 43 L66 48" stroke="#f43f5e" stroke-width="2.5" stroke-linecap="round" class="eyebrow eyebrow-right" />
+
+          <!-- Kollar -->
+          <g class="robo-hand hand-left">
+            <rect x="15" y="72" width="9" height="20" rx="4.5" fill="#334155" />
+          </g>
+          <g class="robo-hand hand-right" id="robo-hand-right">
+            <rect x="96" y="72" width="9" height="20" rx="4.5" fill="#334155" />
+          </g>
+        </svg>
+      </div>
+
+      <!-- Giriş Paneli -->
+      <div id="panel-login" class="form-panel active">
+        <form id="login-form" autocomplete="off" novalidate>
+          <p class="natural-sentence">
+            Sisteme 
+            <input type="email" id="login-email" name="email" class="inline-input" placeholder="e-posta adresim" required /> 
+            ve 
+            <span class="inline-input-wrapper">
+              <input type="password" id="login-password" name="password" class="inline-input" placeholder="şifrem" required />
+              <button type="button" class="inline-peek-btn" id="toggle-login-password" aria-label="Şifreyi göster/gizle">göster</button>
+            </span> 
+            ile, 
+            <button type="button" class="inline-toggle-btn" id="remember-me-btn">beni hatırlamadan</button>
+            <button type="submit" class="inline-submit-btn" id="login-submit-btn">giriş yapmak</button> 
+            istiyorum.
+          </p>
+        </form>
+        <div class="sentence-footer">
+          Hesabınız yoksa <button type="button" class="link-btn" id="switch-to-register">yeni bir hesap oluşturun</button>.
+        </div>
+      </div>
+
+      <!-- Kayıt Paneli -->
+      <div id="panel-register" class="form-panel" hidden>
+        <form id="register-form" autocomplete="off" novalidate>
+          <p class="natural-sentence">
+            Merhaba, adım 
+            <input type="text" id="register-name" name="name" class="inline-input" placeholder="ad soyad" required />. 
+            Sisteme 
+            <input type="email" id="register-email" name="email" class="inline-input" placeholder="e-posta adresim" required /> 
+            ve belirlediğim 
+            <span class="inline-input-wrapper">
+              <input type="password" id="register-password" name="password" class="inline-input" placeholder="şifrem" required />
+              <button type="button" class="inline-peek-btn" id="toggle-register-password" aria-label="Şifreyi göster/gizle">göster</button>
+            </span> 
+            ile 
+            <span class="inline-input-wrapper">
+              <input type="password" id="register-confirm" name="passwordConfirm" class="inline-input" placeholder="onay şifrem" required />
+            </span> 
+            birlikte 
+            <button type="submit" class="inline-submit-btn" id="register-submit-btn">kayıt olmak</button> 
+            istiyorum.
+          </p>
+          
+          <!-- Şifre güç çubukları -->
+          <div class="password-strength" id="register-password-strength" aria-live="polite">
+            <div class="strength-bars">
+              <span class="strength-bar" id="bar-1"></span>
+              <span class="strength-bar" id="bar-2"></span>
+              <span class="strength-bar" id="bar-3"></span>
+              <span class="strength-bar" id="bar-4"></span>
+            </div>
+            <span class="strength-label" id="strength-label"></span>
+          </div>
+        </form>
+        <div class="sentence-footer">
+          Zaten üyeyseniz <button type="button" class="link-btn" id="switch-to-login">giriş yapın</button>.
+        </div>
+      </div>
+
+      <!-- Özür dileme paneli -->
+      <div id="apology-container" class="apology-box" hidden>
+        <button type="button" class="apology-btn" id="apologize-btn">🤖 Robottan Özür Dile (Sakinleştir)</button>
+      </div>
+
+    </div>
+
+    <!-- Dashboard -->
+    <div class="dashboard-card" id="dashboard-card" hidden>
+      <div class="dashboard-avatar" id="dashboard-avatar" aria-hidden="true">US</div>
+      <p class="natural-sentence">
+        Başarıyla giriş yapıldı. <span class="highlight" id="dashboard-welcome">Kullanıcı</span> olarak sistem oturumunuz açık durumda.
+      </p>
+      <p class="dashboard-details" id="dashboard-email"></p>
+      <button class="logout-btn" id="logout-btn">Oturumu Kapat</button>
+    </div>
+
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
